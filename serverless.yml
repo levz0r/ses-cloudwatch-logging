@@ -1,0 +1,51 @@
+service: ses-cloudwatch-logging
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  environment:
+    SENTRY_DSN: ${env:SENTRY_DSN, ''}
+    NODE_ENV: ${self:provider.stage}
+
+functions:
+  sesEvents:
+    handler: handler.sesEventsHandler
+    name: ses-events-processor-${self:provider.stage}
+    description: "Process SES email events and log them to CloudWatch"
+    memorySize: 256
+    timeout: 30
+    environment:
+      LOG_GROUP_NAME: "/aws/ses/email-events-${self:provider.stage}"
+    iamRoleStatementsName: ses-events-cloudwatch-${self:provider.stage}
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - logs:CreateLogGroup
+        Resource:
+          - "arn:aws:logs:${self:provider.region}:*:log-group:/aws/ses/email-events-${self:provider.stage}"
+      - Effect: "Allow"
+        Action:
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          - logs:DescribeLogGroups
+          - logs:DescribeLogStreams
+        Resource:
+          - "arn:aws:logs:${self:provider.region}:*:log-group:/aws/ses/email-events-${self:provider.stage}"
+          - "arn:aws:logs:${self:provider.region}:*:log-group:/aws/ses/email-events-${self:provider.stage}:*"
+    events:
+      - sns:
+          topicName: ses-events-topic-${self:provider.stage}
+          displayName: SES Events Topic for ${self:provider.stage}
+
+plugins:
+  - serverless-iam-roles-per-function
+
+package:
+  patterns:
+    - "!node_modules/**"
+    - "!.git/**"
+    - "!*.md"
+    - "!test-event.js"

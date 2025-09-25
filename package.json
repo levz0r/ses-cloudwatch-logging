@@ -1,0 +1,41 @@
+{
+  "name": "ses-cloudwatch-logging",
+  "version": "1.0.0",
+  "description": "Serverless AWS Lambda function to process SES email events and log them to CloudWatch",
+  "main": "handler.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f sesEvents",
+    "test": "node test-event.js"
+  },
+  "keywords": [
+    "aws",
+    "ses",
+    "cloudwatch",
+    "email",
+    "logging",
+    "serverless",
+    "lambda"
+  ],
+  "author": "Lev Gelfenbuim <hi@lev.engineer>",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.0.0",
+    "@sentry/serverless": "^7.0.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.0.0",
+    "serverless-iam-roles-per-function": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/levz0r/ses-cloudwatch-logging.git"
+  },
+  "bugs": {
+    "url": "https://github.com/levz0r/ses-cloudwatch-logging/issues"
+  },
+  "homepage": "https://github.com/levz0r/ses-cloudwatch-logging#readme"
+}
